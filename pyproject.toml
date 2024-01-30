@@ -9,6 +9,7 @@ packages = [{include = "shopping_cart"}]
 [tool.poetry.dependencies]
 python = "^3.8"
 fastapi = {extras = ["all"], version = "^0.109.0"}
+sqlalchemy = "^2.0.25"
 
 
 [build-system]

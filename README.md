@@ -59,32 +59,152 @@
 | cart_id | int | 購物車ID |
 | product_id | int | 商品ID |
 | quantity | int | 商品數量 |
+| is_checked_out | boolean | 是否結帳 |
 
 
 [購物車 schema diagram](https://dbdiagram.io/d/product-65b755f8ac844320aeeb5da4)
 
 # API
 
-### 登入
+### 用戶
 
 * 登入
+[post] /login
+```json
+{
+    "email": ""
+    "password": ""
+}
+```
+
+* 新增用戶
+
+[post] /users
+```json
+{
+    "email": "",
+    "password": "",
+    "phone": "",
+    "address": ""
+}
+```
+
+* 修改用戶
+
+[patch] /users/{user_id}
+```json
+{
+    "email": "",
+    "password": "",
+    "phone": "",
+    "address": ""
+}
+```
+
+* 刪除用戶
+
+[delete] /users/{user_id}
 
 ### 商品
 
 * 新增商品
+
+[post] /products
+```json
+{
+    "name": "product name",
+    "price": 100,
+    "quantity": 10,
+    "description": "product description",
+    "on_sale_date": "current time"
+}
+```
+
 * 修改商品
+
+[patch] /products/{product_id}
+```json
+{
+    "name": "product name",
+    "price": 100,
+    "quantity": 10,
+    "description": "product description",
+    "on_sale_date": "current time"
+}
+```
 * 刪除商品
+
+[delete] /products/{product_id}
+
 * 查詢商品
+
+[get] /products/{product_id}
+
+* 查詢所有商品
+
+[get] /products
 
 ### 購物車
 
 * 新增商品到購物車
+
+[post] /carts/{cart_id}/items
+```json
+{
+    "product_id": 1,
+    "quantity": 10
+}
+```
+
 * 修改購物車內商品
+
+[patch] /carts/{cart_id}/items/{item_id}
+```json
+{
+    "quantity": 10
+    "is_checked_out": true
+}
+```
 * 刪除購物車內商品
+
+[delete] /carts/{cart_id}/items/{item_id}
+
 * 查詢購物車內商品
+
+[get] /carts/{cart_id}/items/{item_id}
+
+* 查詢購物車內所有商品
+
+[get] /carts/{cart_id}/items
+
+* 購物車結帳
+
+[post] /carts/{cart_id}/checkout
 
 
 ### 訂單
 
-* 結帳
+* 新增訂單
+
+[post] /orders
+```json
+{
+    "user_id": "user id",
+    "product_id": 1,
+    "quantity": 10
+}
+```
+
 * 查詢訂單
+
+[get] /orders/{order_id}
+
+## 記錄想到的問題
+
+* 1/30
+
+1. 購物車結帳前，購物車裡面有選項表示最後是否要結帳(ex. ui checkbox)，有想到兩種方式，需思考哪種方式比較好 (暫時選a)
+
+    a. 每次打勾都修改購物車內商品的is_checked_out，最後結帳時，後端只要查詢is_checked_out為true的商品即可
+
+    b. 每次打勾由前端記錄狀態，最後結帳時送body給後端去最後結帳
