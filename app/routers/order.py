@@ -1,9 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body, Path, Query
+from schema import order
+from typing import List
 
 
-router = APIRouter(prefix="/orders")
+router = APIRouter(prefix="/orders", tags=["Order"])
 
-@router.post("")
+@router.post("", response_model=order.OutOrder)
 async def create_order():
     '''
     Create Order API
@@ -12,7 +14,7 @@ async def create_order():
     return {"message": "Create Order"}
 
 
-@router.get("")
+@router.get("", response_model=List[order.OutOrder])
 async def get_all_orders():
     '''
     Get All Orders API
@@ -21,7 +23,7 @@ async def get_all_orders():
     return {"message": "Get All Orders"}
 
 
-@router.get("/{order_id}")
+@router.get("/", response_model=order.OutOrder)
 async def get_order(order_id: int):
     '''
     Get Order API

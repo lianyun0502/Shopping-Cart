@@ -9,8 +9,8 @@ app = FastAPI(
 )
 
 routers = [cart.router, order.router, product.router, user.router]
-for r in routers:
-    app.include_router(r)
+for router in routers:
+    app.include_router(router)
 
 
 @app.get("/")
