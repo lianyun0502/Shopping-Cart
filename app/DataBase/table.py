@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm.session import sessionmaker
+from sqlalchemy.orm.session import sessionmaker, Session
 from .base import Base, engine
 
 class Users(Base):
@@ -10,9 +10,9 @@ class Users(Base):
     email = Column(String(50))
     phone = Column(String(50))
     address = Column(String(50))
-    cart_id = Column(Integer, unique=True, foreign_key='carts.id')
 
-    cart = relationship('Carts', back_populates='user')
+    orders = relationship('Orders')
+    carts = relationship('Carts')
 
 
 class Products(Base):
@@ -24,50 +24,51 @@ class Products(Base):
     description = Column(Text)
     quantity = Column(Integer)
     on_sale_date = Column(DateTime)
+    
+    orders = relationship('Orders')
+    cart_items = relationship('CartItems')
 
 
 class Orders(Base):
     __tablename__ = 'orders'
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(String(50), foreign_key='users.id')
-    product_id = Column(Integer, foreign_key='products.id')
+    user_id = Column(String(50), ForeignKey('users.id'))
+    product_id = Column(Integer, ForeignKey('products.id'))
     quantity = Column(Integer)
     order_date = Column(DateTime)
 
-    user = relationship('Users', back_populates='orders')
-    product = relationship('Products', back_populates='orders')
+    users = relationship('Users')
+    products = relationship('Products')
     
 
 class Carts(Base):
     __tablename__ = 'carts'
 
     id = Column(Integer, primary_key=True)
+    user_id = Column(String(50), ForeignKey('users.id'))
 
-    user = relationship('Users', back_populates='cart')
+    cart_items = relationship('CartItems')
 
 
 class CartItems(Base):
     __tablename__ = 'cart_items'
 
     id = Column(Integer, primary_key=True)
-    cart_id = Column(Integer, foreign_key='carts.id')
-    product_id = Column(Integer, foreign_key='products.id')
+    cart_id = Column(Integer, ForeignKey('carts.id'))
+    product_id = Column(Integer, ForeignKey('products.id'))
     quantity = Column(Integer)
     is_checked_out = Column(Boolean, default=True)
-
-    cart = relationship('Carts', back_populates='cart_items')
-    product = relationship('Products', back_populates='cart_items')
 
 
 
 Base.metadata.create_all(bind=engine)
 
-Session:sessionmaker = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal:sessionmaker = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 #Dependency
 def get_db():
-    db = Session()
+    db:Session = SessionLocal()
     try:
         yield db
     finally:
