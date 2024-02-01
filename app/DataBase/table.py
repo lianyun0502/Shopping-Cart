@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm.session import sessionmaker, Session
 from .base import Base, engine
 from datetime import datetime
 
@@ -12,8 +11,8 @@ class Users(Base):
     phone = Column(String(50))
     address = Column(String(50))
 
-    orders = relationship('Orders')
-    carts = relationship('Carts')
+    orders = relationship('Orders', backref='users')
+    carts = relationship('Carts', uselist=False, backref='users') # one to one relationship
 
 
 class Products(Base):
@@ -26,8 +25,8 @@ class Products(Base):
     investory = Column(Integer)
     on_sale_date = Column(DateTime, default=datetime.utcnow())
     
-    orders = relationship('Orders')
-    cart_items = relationship('CartItems')
+    orders = relationship('Orders', backref='products')
+    cart_items = relationship('CartItems', backref='products')
 
 
 class Orders(Base):
@@ -39,8 +38,8 @@ class Orders(Base):
     quantity = Column(Integer)
     order_date = Column(DateTime, default=datetime.utcnow())
 
-    users = relationship('Users')
-    products = relationship('Products')
+    users = relationship('Users', backref='orders')
+    products = relationship('Products', backref='orders')
     
 
 class Carts(Base):
@@ -49,7 +48,7 @@ class Carts(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(String(50), ForeignKey('users.id'))
 
-    cart_items = relationship('CartItems')
+    cart_items = relationship('CartItems', backref='carts')
 
 
 class CartItems(Base):
@@ -65,13 +64,7 @@ class CartItems(Base):
 
 Base.metadata.create_all(bind=engine)
 
-SessionLocal:sessionmaker = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-#Dependency
-def get_db():
-    db:Session = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close_all()
+
+
     

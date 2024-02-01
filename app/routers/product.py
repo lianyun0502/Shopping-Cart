@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
 from schema import product
 from typing import List
-from DataBase.table import Products, get_db, Session
+from DataBase import table
+from DataBase.base import get_db, Session
 
 
 router = APIRouter(prefix="/products", tags=["Product"])
@@ -14,7 +15,7 @@ async def add_product(product: product.CreateProduct=Body(...),
     Create Product API
     透過 body 傳入商品資訊, 並在資料庫中新增商品
     '''
-    product = Products(**product.model_dump())
+    product = table.Products(**product.model_dump())
     db.add(product)
     db.commit()
     db.refresh(product)
@@ -30,9 +31,9 @@ async def update_product(product_id: int,
     透過 Path 選擇商品，並根據body在資料庫中更新商品資訊，只能更新部分欄位
     '''
     
-    db.query(Products).filter(Products.id == product_id).update(product.model_dump())
+    db.query(table.table.Products).filter(table.Products.id == product_id).update(product.model_dump())
     db.commit()
-    out_product = db.query(Products).filter(Products.id == product_id).scalar()
+    out_product = db.query(table.Products).filter(table.Products.id == product_id).scalar()
     return out_product
 
 @router.delete("/", response_model=product.OutProduct)
@@ -42,7 +43,7 @@ async def delete_product(product_id: int,
     Delete Product API
     透過 Path 選擇商品，並在資料庫中刪除商品
     '''
-    product = db.query(Products).filter(Products.id == product_id).scalar()
+    product = db.query(table.Products).filter(table.Products.id == product_id).scalar()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     db.delete(product)
@@ -55,7 +56,7 @@ async def get_all_products(skip: int = 0, limit: int = 100, db:Session=Depends(g
     Get All Products API
     取得所有商品資訊
     '''
-    products = db.query(Products).offset(skip).limit(limit).all()
+    products = db.query(table.Products).offset(skip).limit(limit).all()
     return products
 
 @router.get("/", response_model=product.OutProduct)
@@ -64,7 +65,7 @@ async def get_product(product_id: int, db:Session=Depends(get_db)):
     Get Product API
     透過 Path 選擇商品，並取得商品資訊
     '''
-    product = db.query(Products).filter(Products.id == product_id).scalar()
+    product = db.query(table.Products).filter(table.Products.id == product_id).scalar()
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
     return product

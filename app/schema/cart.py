@@ -5,8 +5,20 @@ class Cart(BaseModel):
     '''
     Cart Schema
     '''
-    id : int = Field(..., example=1)
+    user_id : str = Field(..., example=1, max_length=50)
 
+
+class OutCart(Cart):
+    '''
+    Out Cart Schema
+    '''
+    id: int 
+
+class CreateCart(Cart):
+    '''
+    Create Cart Schema
+    '''
+    ...
 
 class CartItem(BaseModel):
     '''
@@ -18,10 +30,9 @@ class CreateCartItem(CartItem):
     '''
     Create Cart Item Schema
     '''
-    cart_id: int = Field(..., example=1)
     product_id: int = Field(..., example=1)
     quantity: int = Field(..., example=1)
-    is_checked_out: bool = Field(..., example=True)
+    is_checked_out: bool = Field(True, example=True)
 
 
 class UpdateCartItem(CartItem):
@@ -36,10 +47,10 @@ class OutCartItem(CartItem):
     '''
     Out Cart Item Schema
     '''
-    id: int = Field(..., example=1)
-    cart_id: int = Field(..., example=1)
-    product_id: int = Field(..., example=1)
-    quantity: int = Field(..., example=1)
-    is_checked_out: bool = Field(..., example=True)
+    id: int 
+    cart_id: int 
+    product_id: int 
+    quantity: int 
+    is_checked_out: bool 
 
 
