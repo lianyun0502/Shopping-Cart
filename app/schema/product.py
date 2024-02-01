@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
-from time import time
+from datetime import datetime
+from uuid import UUID
 
 class Product(BaseModel):
     '''
@@ -20,9 +21,9 @@ class OutProduct(Product):
     '''
     Out Product Schema
     '''
-    id: int = Field(..., example=1)
-    investory: int = Field(..., example=10)
-    on_sale_date: float = Field(time(), example=time())
+    id: int 
+    investory: int 
+    on_sale_date: datetime 
 
 class UpdateProduct(Product):
     '''

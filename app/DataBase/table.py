@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Bool
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import sessionmaker, Session
 from .base import Base, engine
+from datetime import datetime
 
 class Users(Base):
     __tablename__ = 'users'
@@ -18,12 +19,12 @@ class Users(Base):
 class Products(Base):
     __tablename__ = 'products'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50))
     price = Column(Integer)
     description = Column(Text)
-    quantity = Column(Integer)
-    on_sale_date = Column(DateTime)
+    investory = Column(Integer)
+    on_sale_date = Column(DateTime, default=datetime.utcnow())
     
     orders = relationship('Orders')
     cart_items = relationship('CartItems')
@@ -32,11 +33,11 @@ class Products(Base):
 class Orders(Base):
     __tablename__ = 'orders'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(String(50), ForeignKey('users.id'))
     product_id = Column(Integer, ForeignKey('products.id'))
     quantity = Column(Integer)
-    order_date = Column(DateTime)
+    order_date = Column(DateTime, default=datetime.utcnow())
 
     users = relationship('Users')
     products = relationship('Products')
@@ -45,7 +46,7 @@ class Orders(Base):
 class Carts(Base):
     __tablename__ = 'carts'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(String(50), ForeignKey('users.id'))
 
     cart_items = relationship('CartItems')
@@ -54,7 +55,7 @@ class Carts(Base):
 class CartItems(Base):
     __tablename__ = 'cart_items'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     cart_id = Column(Integer, ForeignKey('carts.id'))
     product_id = Column(Integer, ForeignKey('products.id'))
     quantity = Column(Integer)
