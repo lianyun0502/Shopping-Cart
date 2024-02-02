@@ -21,7 +21,8 @@ class OutProduct(Product):
     '''
     Out Product Schema
     '''
-    id: int 
+    id: int
+    user_id:str
     investory: int 
     on_sale_date: datetime 
 

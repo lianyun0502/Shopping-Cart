@@ -50,9 +50,9 @@ if __name__ == "__main__":
     #     db.commit()
 
     #     products = [
-    #         table.Products(name="Apple", price=10, description="From Taiwan", investory=100),
-    #         table.Products(name="Banana", price=20, description="From Taiwan", investory=100),
-    #         table.Products(name="Carrot", price=30, description="From Taiwan", investory=100),
+    #         table.Products(name="Apple", price=10, description="From Taiwan", investory=100, user_id="Eric"),
+    #         table.Products(name="Banana", price=20, description="From Taiwan", investory=100, user_id="Eric"),
+    #         table.Products(name="Carrot", price=30, description="From Taiwan", investory=100, user_id="Eric"),
     #     ]
 
     #     db.add_all(products)

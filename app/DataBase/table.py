@@ -13,6 +13,7 @@ class Users(Base):
 
     orders = relationship('Orders', backref='users')
     carts = relationship('Carts', uselist=False, backref='users') # one to one relationship
+    products = relationship('Products', backref='users')
 
     def __init__(self, id, email, phone, address):
         self.id = id
@@ -25,6 +26,7 @@ class Products(Base):
     __tablename__ = 'products'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String(50), ForeignKey('users.id'))
     name = Column(String(50))
     price = Column(Integer)
     description = Column(Text)
@@ -34,11 +36,12 @@ class Products(Base):
     orders = relationship('Orders', backref='products')
     cart_items = relationship('CartItems', backref='products')
 
-    def __init__(self, name, price, description, investory):
+    def __init__(self, name, price, description, investory, user_id):
         self.name = name
         self.price = price
         self.description = description
         self.investory = investory
+        self.user_id = user_id
 
 
 class Orders(Base):
