@@ -14,6 +14,12 @@ class Users(Base):
     orders = relationship('Orders', backref='users')
     carts = relationship('Carts', uselist=False, backref='users') # one to one relationship
 
+    def __init__(self, id, email, phone, address):
+        self.id = id
+        self.email = email
+        self.phone = phone
+        self.address = address
+
 
 class Products(Base):
     __tablename__ = 'products'
@@ -28,6 +34,12 @@ class Products(Base):
     orders = relationship('Orders', backref='products')
     cart_items = relationship('CartItems', backref='products')
 
+    def __init__(self, name, price, description, investory):
+        self.name = name
+        self.price = price
+        self.description = description
+        self.investory = investory
+
 
 class Orders(Base):
     __tablename__ = 'orders'
@@ -38,10 +50,7 @@ class Orders(Base):
     quantity = Column(Integer)
     order_date = Column(DateTime, default=datetime.utcnow())
 
-    users = relationship('Users', backref='orders')
-    products = relationship('Products', backref='orders')
     
-
 class Carts(Base):
     __tablename__ = 'carts'
 
@@ -49,6 +58,9 @@ class Carts(Base):
     user_id = Column(String(50), ForeignKey('users.id'))
 
     cart_items = relationship('CartItems', backref='carts')
+
+    def __init__(self, user_id):
+        self.user_id = user_id
 
 
 class CartItems(Base):
