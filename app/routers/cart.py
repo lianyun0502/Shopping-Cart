@@ -1,54 +1,80 @@
 from fastapi import APIRouter, Body, Depends
 from fastapi.exceptions import HTTPException
 from schema import cart
-from typing import List
+from typing import List, Optional
 from DataBase import table
 from DataBase.base import Session, get_db
 
 
 router = APIRouter(prefix="/carts", tags=["Cart"])
 
-@router.post("/{cart_id}/items", response_model=cart.OutCartItem)
-async def add_item(cart_id: int, cart_item: cart.CreateCartItem=Body(...), db: Session = Depends(get_db)):
+
+def is_user_exist(user_id:str, db:Session)->Optional[table.Users]:
+    user = db.query(table.Users).filter(table.Users.id == user_id).scalar()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+@router.post("/{user_id}/items", response_model=cart.OutCartItem)
+async def add_item(user_id: str, cart_item: cart.CreateCartItem=Body(...), db: Session = Depends(get_db)):
     '''
     Add Item to Cart API
     透過 Path 選擇購物車，並在資料庫中新增商品至購物車
     一次一種商品
     '''
-    cart_item = table.CartItems(cart_id=cart_id, **cart_item.model_dump())
-    cart = db.query(table.Carts).filter(table.Carts.id == cart_id).scalar()
+    user = is_user_exist(user_id=user_id, db=db)
+    cart = db.query(table.Carts).join(table.Users, table.Carts.user_id == user_id).filter(table.Carts.user_id == user_id).scalar()
     if cart is None:
         raise HTTPException(status_code=404, detail="Cart not found")
+    cart_item = table.CartItems(cart_id=cart.id, **cart_item.model_dump())
     db.add(cart_item)
     db.commit()
     db.refresh(cart_item)
     return cart_item
 
-@router.put("/items", response_model=cart.OutCartItem)
-async def update_item(id: int, cart_item: cart.UpdateCartItem=Body(...),
-                      db: Session = Depends(get_db)):
+@router.put("/{user_id}/items", response_model=cart.OutCartItem)
+async def update_item(
+    user_id: str, 
+    id: int, 
+    cart_item: cart.UpdateCartItem=Body(...),
+    db: Session = Depends(get_db)
+    ):
     '''
     Update Item in Cart API
     透過 Path 選擇購物車及商品，並根據body在資料庫中更新商品資訊，只能更新部分欄位
     '''
-    db.query(table.CartItems).filter(table.CartItems.id == id).update(cart_item.model_dump())
+    user = is_user_exist(user_id=user_id, db=db)
+    cart = db.query(table.Carts).join(table.Users, table.Carts.user_id == user_id).filter(table.Carts.user_id == user_id).scalar()
+    if cart is None:
+        raise HTTPException(status_code=404, detail="Cart not found")
+    cart_item_query = db.query(table.CartItems).filter(table.CartItems.cart_id == cart.id and table.CartItems.id == id)
+    out_cart_item = cart_item_query.scalar()
+    if out_cart_item is None:
+        raise HTTPException(status_code=404, detail="Cart Item not found")
+    cart_item_query.update(cart_item.model_dump())
     db.commit()
-    out_cart_item = db.query(table.CartItems).filter(table.CartItems.id == id).scalar()
+    db.refresh(out_cart_item)
+
     return out_cart_item
 
 
-@router.delete("/items/", response_model=List[cart.OutCartItem])
-async def delete_item(id: int, db: Session = Depends(get_db)):
+@router.delete("/{user_id}/items", response_model=cart.OutCartItem)
+async def delete_item(user_id:str, id: int, db: Session = Depends(get_db)):
     '''
     Delete Item in Cart API
     透過 Path 選擇購物車及商品，並在資料庫中刪除商品
     '''
-    query = db.query(table.CartItems).filter(table.CartItems.id == id)
-    out_cart_item = query.scalar()
+    user = is_user_exist(user_id=user_id, db=db)
+    cart = db.query(table.Carts).join(table.Users, table.Carts.user_id == user_id).filter(table.Carts.user_id == user_id).scalar()
+    if cart is None:
+        raise HTTPException(status_code=404, detail="Cart not found")
+    cart_item_query = db.query(table.CartItems).filter(table.CartItems.id == id and table.CartItems.cart_id == cart.id)
+    out_cart_item = cart_item_query.scalar()
     if out_cart_item is None:
         raise HTTPException(status_code=404, detail="Cart Item not found")
-    query.delete()
+    cart_item_query.delete()
     db.commit()
+    # db.refresh(out_cart_item)
     return out_cart_item
 
 
