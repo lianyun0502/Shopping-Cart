@@ -22,7 +22,7 @@ async def add_product(
     '''
     Create Product API
 
-        根據 Path 選擇使用者，並透過 body 傳入商品資訊, 並在資料庫中新增商品
+        user 透過 body 傳入商品資訊, 並在資料庫中新增商品
     '''
     
     product = table.Products(user_id=user.id, **product.model_dump())
@@ -41,7 +41,7 @@ async def update_product(
     '''
     Update Product API
 
-        透過Path以及Query選擇使用者的商品，並根據body在資料庫中更新商品資訊，只能更新部分欄位
+        使用者上架的商品，並根據body在資料庫中更新商品資訊，只能更新部分欄位
         會檢查使用者商品是否存在，若不存在則回傳 404, Product not found
         
     '''
@@ -63,7 +63,8 @@ async def delete_product(
     db:Session=Depends(get_db)):
     '''
     Delete Product API
-        透過 Path 選擇使用者商品，並在資料庫中刪除商品
+
+        刪除使用者上架的商品
     '''
     query = db.query(table.Products)
     product = query.filter(table.Products.id == product_id and table.Users.id == user.id).scalar()
@@ -81,8 +82,10 @@ async def get_all_products(
     '''
     Get All Products API
 
-        取得所有商品資訊
-        user_id: 選擇使用者，如果參數存在則取得該使用者的商品
+        取得上架的所有商品資訊
+        透過 Query 參數選擇分頁
+        skip: 起始位置
+        limit: 取得筆數
     '''
     products = db.query(table.Products).offset(skip).limit(limit).all()
     return products
@@ -95,7 +98,11 @@ async def get_product(
     db:Session=Depends(get_db)):
     '''
     Get Product API
-    透過 Path 選擇商品，並取得商品資訊
+
+        取得user上架的所有商品資訊
+        透過 Query 參數選擇分頁
+        skip: 起始位置
+        limit: 取得筆數
     '''
     query = db.query(table.Products).join(table.Users, table.Products.user_id == table.Users.id).filter(table.Users.id == user.id)
     products = query.offset(skip).limit(limit).all()

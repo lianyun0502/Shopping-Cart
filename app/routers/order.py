@@ -68,7 +68,7 @@ async def get_user_orders(
     '''
     Get User Orders API
 
-        透過 Path 選擇使用者，並取得使用者的訂單
+        取得使用者所有的訂單
         可透過 Query 參數選擇時間區間
         start_date: 起始時間
         end_date: 結束時間

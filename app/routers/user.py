@@ -39,7 +39,7 @@ async def delete_user(
     '''
     Delete User API
 
-        透過 Path 選擇使用者，並在資料庫中刪除使用者以及使用者的購物車和購物車內的商品
+        刪除使用者以及使用者的購物車和購物車內的商品
     '''
     cart = db.query(table.Carts).filter(table.Carts.user_id == user.id).scalar()
     cart_query = db.query(table.Carts).join(table.CartItems, table.Carts.id == table.CartItems.cart_id)
@@ -58,7 +58,7 @@ async def get_user(
     '''
     Get User API
 
-        透過 Path 選擇使用者，並取得使用者資訊
+        取得登入使用者資訊
     '''
     return user
 
@@ -67,7 +67,7 @@ async def get_all_users(db: Session = Depends(get_db)):
     '''
     Get All Users API
 
-        取得所有使用者資訊
+        取得所有註冊的使用者資訊
     '''
     users = db.query(table.Users).all()
     return users
