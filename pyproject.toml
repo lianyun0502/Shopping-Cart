@@ -10,6 +10,8 @@ packages = [{include = "shopping_cart"}]
 python = "^3.8"
 fastapi = {extras = ["all"], version = "^0.109.0"}
 sqlalchemy = "^2.0.25"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 
 
 [build-system]

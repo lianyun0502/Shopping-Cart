@@ -1,14 +1,16 @@
 from fastapi import APIRouter, Body, Path, Query, Depends
 from fastapi.exceptions import HTTPException
 from schema import user
-from typing import List
+from typing import List, Annotated
 from DataBase import table
 from DataBase.base import Session, get_db
 from uuid import uuid4
-
+from passlib.context import CryptContext
 
 
 router = APIRouter(prefix="/users", tags=["User"])
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 @router.post("", response_model=user.OutUser)
@@ -23,6 +25,7 @@ async def create_user(user: user.CreateUser=Body(...),
     '''
     if db.query(table.Users).filter(table.Users.id == user.id).scalar():
         raise HTTPException(status_code=400, detail="User already registered")
+    user.password = pwd_context.hash(user.password)
     db.add(table.Users(**user.model_dump()))
     db.add(table.Carts(user_id=user.id))
     db.commit()

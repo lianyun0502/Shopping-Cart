@@ -10,16 +10,18 @@ class Users(Base):
     email = Column(String(50))
     phone = Column(String(50))
     address = Column(String(50))
+    password = Column(String(50))
 
     orders = relationship('Orders', backref='users')
     carts = relationship('Carts', uselist=False, backref='users') # one to one relationship
     products = relationship('Products', backref='users')
 
-    def __init__(self, id, email, phone, address):
+    def __init__(self, id, email, phone, address, password):
         self.id = id
         self.email = email
         self.phone = phone
         self.address = address
+        self.password = password
 
 
 class Products(Base):
