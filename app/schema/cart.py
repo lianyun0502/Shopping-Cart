@@ -5,13 +5,14 @@ class Cart(BaseModel):
     '''
     Cart Schema
     '''
-    user_id : str = Field(..., example=1, max_length=50)
-
+    ...
+    
 
 class OutCart(Cart):
     '''
     Out Cart Schema
     '''
+    user_id : str
     id: int 
 
 class CreateCart(Cart):

@@ -80,10 +80,12 @@ async def get_all_products(user_id:Optional[str] = None ,skip: int = 0, limit: i
     Get All Products API
 
         取得所有商品資訊
+        user_id: 選擇使用者，如果參數存在則取得該使用者的商品
     '''
     if user_id:
         user = is_user_exist(user_id=user_id, db=db)
-        products = db.query(table.Products).filter(table.Products.user_id == user_id).offset(skip).limit(limit).all()
+        query = db.query(table.Products).join(table.Users, table.Products.user_id == table.Users.id).filter(table.Users.id == user_id)
+        products = query.offset(skip).limit(limit).all()
     else:
         products = db.query(table.Products).offset(skip).limit(limit).all()
     return products

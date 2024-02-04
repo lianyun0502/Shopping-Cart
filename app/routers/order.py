@@ -73,11 +73,10 @@ async def get_user_orders(user_id: str, skip: int = 0,
         skip: 起始位置
         limit: 取得筆數
     '''
+    query = db.query(table.Orders).join(table.Users, table.Orders.user_id == table.Users.id).filter(table.Users.id == user_id)
     if start_date:
-        orders = db.query(table.Orders).filter(table.Orders.user_id == user_id, 
-                                               table.Orders.order_date >= start_date,
-                                               table.Orders.order_date <= end_date).offset(skip).limit(limit).all()
+        orders = query.filter(table.Orders.order_date >= start_date,
+                              table.Orders.order_date <= end_date).offset(skip).limit(limit).all()
     else:
-        orders = db.query(table.Orders).filter(table.Orders.user_id == user_id,
-                                               table.Orders.order_date <= end_date).offset(skip).limit(limit).all()
+        orders = query.filter(table.Orders.order_date <= end_date).offset(skip).limit(limit).all()
     return orders
