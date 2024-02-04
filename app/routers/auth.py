@@ -71,7 +71,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta])->str:
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     '''取得當前使用者'''
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

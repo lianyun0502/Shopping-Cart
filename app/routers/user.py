@@ -6,6 +6,7 @@ from DataBase import table
 from DataBase.base import Session, get_db
 from uuid import uuid4
 from passlib.context import CryptContext
+from routers import auth
 
 
 router = APIRouter(prefix="/users", tags=["User"])
@@ -31,24 +32,18 @@ async def create_user(user: user.CreateUser=Body(...),
     db.commit()
     return user
 
-@router.delete("{user_id}", response_model=user.OutUser)
-async def delete_user(user_id: str, 
-                      db: Session = Depends(get_db)):
+@router.delete("", response_model=user.OutUser)
+async def delete_user(
+    user: Annotated[table.Users, Depends(auth.get_current_user)],
+    db: Session = Depends(get_db)):
     '''
     Delete User API
 
         透過 Path 選擇使用者，並在資料庫中刪除使用者以及使用者的購物車和購物車內的商品
     '''
-
-    user = db.query(table.Users).filter(table.Users.id == user_id).scalar()
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    cart = db.query(table.Carts).filter(table.Carts.user_id == user_id).scalar()
-
+    cart = db.query(table.Carts).filter(table.Carts.user_id == user.id).scalar()
     cart_query = db.query(table.Carts).join(table.CartItems, table.Carts.id == table.CartItems.cart_id)
     cart_items = cart_query.filter(table.CartItems.cart_id == cart.id).all()
-
     db.delete(user)
     db.delete(cart)
     for item in cart_items:
@@ -56,19 +51,18 @@ async def delete_user(user_id: str,
     db.commit()
     return user
 
-@router.get("{user_id}", response_model=user.OutUser)
-async def get_user(user_id: str, db: Session = Depends(get_db)):
+@router.get("", response_model=user.OutUser)
+async def get_user(
+    user: Annotated[table.Users, Depends(auth.get_current_user)], 
+    db: Session = Depends(get_db)):
     '''
     Get User API
 
         透過 Path 選擇使用者，並取得使用者資訊
     '''
-    user = db.query(table.Users).filter(table.Users.id == user_id).scalar()
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
     return user
 
-@router.get("", response_model=List[user.OutUser])
+@router.get("/all", response_model=List[user.OutUser])
 async def get_all_users(db: Session = Depends(get_db)):
     '''
     Get All Users API

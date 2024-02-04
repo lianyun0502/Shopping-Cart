@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends
 from typing import Annotated, Optional
 from fastapi.exceptions import HTTPException
+from fastapi.responses import PlainTextResponse
 from routers import cart, order, product, user, auth
 
 
@@ -17,9 +18,9 @@ for router in routers:
     app.include_router(router)
 
 
-@app.get("/")
+@app.get("/", response_class=PlainTextResponse)
 async def root():
-    return {"message": "Hello World"}
+    return f"Welcome to Shopping Cart API"
 
 
 
