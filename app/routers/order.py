@@ -1,17 +1,18 @@
 from fastapi import APIRouter, Body, Path, Query, Depends
 from fastapi.exceptions import HTTPException
 from schema import order
-from typing import List, Optional
+from typing import List, Optional, Annotated
 from DataBase import table
 from DataBase.base import Session, get_db
 from sqlalchemy import select
 from datetime import datetime
+from routers import auth
 
 router = APIRouter(prefix="/orders", tags=["Order"])
 
 @router.post("", response_model=order.OutOrder)
 async def create_order(
-    user_id: str,
+    user: Annotated[table.Users, Depends(auth.get_current_user)],
     order: order.CreateOrder=Body(...),
     db: Session = Depends(get_db)):
     '''
@@ -33,14 +34,14 @@ async def create_order(
     
     product_query.update({"investory": product.investory - order.quantity})
     
-    order = table.Orders(user_id=user_id, **order.model_dump())
+    order = table.Orders(user_id=user.id, **order.model_dump())
     db.add(order)
     db.commit()
     db.refresh(order)
     return order
 
 
-@router.get("", response_model=List[order.OutOrder])
+@router.get("/all", response_model=List[order.OutOrder])
 async def get_all_orders(db: Session = Depends(get_db),
                          skip: int = 0,
                          limit: int = 10):
@@ -56,16 +57,18 @@ async def get_all_orders(db: Session = Depends(get_db),
     return orders
 
 
-@router.get("/{user_id}", response_model=List[order.OutOrder])
-async def get_user_orders(user_id: str, skip: int = 0,
-                         limit: int = 10, 
-                         start_date: Optional[datetime] = None,
-                         end_date: datetime = datetime.now(),
-                         db: Session = Depends(get_db)):
+@router.get("", response_model=List[order.OutOrder])
+async def get_user_orders(
+    user: Annotated[table.Users, Depends(auth.get_current_user)],
+    skip: int = 0,
+    limit: int = 10, 
+    start_date: Optional[datetime] = None,
+    end_date: datetime = datetime.now(),
+    db: Session = Depends(get_db)):
     '''
     Get User Orders API
 
-        透過 Path 選擇使用者，並取得使用者的訂單
+        取得使用者所有的訂單
         可透過 Query 參數選擇時間區間
         start_date: 起始時間
         end_date: 結束時間
@@ -73,7 +76,7 @@ async def get_user_orders(user_id: str, skip: int = 0,
         skip: 起始位置
         limit: 取得筆數
     '''
-    query = db.query(table.Orders).join(table.Users, table.Orders.user_id == table.Users.id).filter(table.Users.id == user_id)
+    query = db.query(table.Orders).join(table.Users, table.Orders.user_id == table.Users.id).filter(table.Users.id == user.id)
     if start_date:
         orders = query.filter(table.Orders.order_date >= start_date,
                               table.Orders.order_date <= end_date).offset(skip).limit(limit).all()

@@ -71,7 +71,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta])->str:
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     '''取得當前使用者'''
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -88,6 +88,11 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session 
 
 @router.post("/token", response_model=auth.Token)
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
+    '''
+    登入 API
+
+        透過 form 傳入使用者id和密碼, 並驗證使用者身份後回傳 JWT token 作為登入憑證
+    '''
     user = authenticate_user(form_data.username, form_data.password, db=db)
     access_token = create_access_token(
         data={"sub": user.id}, 

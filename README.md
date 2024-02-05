@@ -16,18 +16,23 @@
 
 ## 安裝與執行步驟
 
-## Database Scehma
+## Database 
 
-### users
+這裡的資料庫使用python原生的sqlite3，並且使用sqlalchemy來操作資料庫。
+
+### Schema
+* users
+
 | 欄位名稱 | 資料型態 | 說明 |
 | -------- | -------- | ---- |
 | id | varchar(50) | 使用者ID (pk)|
 | email | varchar(50) | 使用者信箱 (not null)|
 | phone | varchar(50) | 使用者電話 (not null)|
 | address | varchar(50) | 使用者地址 (not null)|
-| cart_id | int | 購物車ID (unique)|
+| password | varchar(50) | 使用者密碼 (not null)|
 
-### products
+* products
+
 | 欄位名稱 | 資料型態 | 說明 |
 | -------- | -------- | ---- |
 | id | int | 商品ID (pk)|
@@ -36,14 +41,18 @@
 | quantity | int | 商品數量 |
 | description | text | 商品描述 |
 | on_sale_date | datetime | 上架日期 |
+| user_id | varchar(50) | 上架者ID |
 
-### carts
+* carts
+
 | 欄位名稱 | 資料型態 | 說明 |
 | -------- | -------- | ---- |
 | id | int | 購物車ID (pk)|
+| user_id | varchar(50) | 使用者ID |
 
 
-### orders
+* orders
+
 | 欄位名稱 | 資料型態 | 說明 |
 | -------- | -------- | ---- |
 | id | int | 訂單ID (pk)|
@@ -52,7 +61,8 @@
 | quantity | int | 商品數量 |
 
 
-### cart_items
+* cart_items
+
 | 欄位名稱 | 資料型態 | 說明 |
 | -------- | -------- | ---- |
 | id | int | 購物車商品ID (pk)|
@@ -64,147 +74,39 @@
 
 [購物車 schema diagram](https://dbdiagram.io/d/product-65b755f8ac844320aeeb5da4)
 
-# API
+## API DOCUMENTATION
 
-### 用戶
+關於API的詳細說明文件，fastapi會自動產生，再啟動SERVER後可以透過以下連結查看 [swagger UI](http://127.0.0.1:5000/docs)
 
-* 登入
-[post] /login
-```json
-{
-    "email": ""
-    "password": ""
-}
-```
+## AUTHORS
 
-* 新增用戶
+此版本有加入身分驗證以及授權API，再使用者登入後會產生一個JWT token，某些API每次request時都會檢查token是否合法。
 
-[post] /users
-```json
-{
-    "email": "",
-    "password": "",
-    "phone": "",
-    "address": ""
-}
-```
+### 使用者登入
 
-* 修改用戶
+在Auth類別裡的第一個POST API 為登入API，
+![登入](.\image\login.png)
 
-[patch] /users/{user_id}
-```json
-{
-    "email": "",
-    "password": "",
-    "phone": "",
-    "address": ""
-}
-```
+按下Try it out後只需輸入username和password案execute即可登入。
+![登入2](.\image\login2.png)
 
-* 刪除用戶
+登入成功後會產生一個JWT token，再每次request時都會檢查token是否合法。
+![登入3](.\image\login3.png)
 
-[delete] /users/{user_id}
+### 授權API
 
-### 商品
+當看到API旁邊有鎖頭的圖示時，就代表每次request時都會檢查token是否合法。
+![授權API](.\image\auth.png)
 
-* 新增商品
+這時只需點開鎖頭圖示，再輸入username和password後案Authorize，如果為已登入帳號，即可使用該API。
 
-[post] /products
-```json
-{
-    "name": "product name",
-    "price": 100,
-    "quantity": 10,
-    "description": "product description",
-    "on_sale_date": "current time"
-}
-```
+Eric的帳號已經建立，可以直接使用
+* username: Eric
+* password: ericpass
 
-* 修改商品
-
-[patch] /products/{product_id}
-```json
-{
-    "name": "product name",
-    "price": 100,
-    "quantity": 10,
-    "description": "product description",
-    "on_sale_date": "current time"
-}
-```
-* 刪除商品
-
-[delete] /products/{product_id}
-
-* 查詢商品
-
-[get] /products/{product_id}
-
-* 查詢所有商品
-
-[get] /products
-
-### 購物車
-
-* 新增商品到購物車
-
-[post] /carts/{cart_id}/items
-```json
-{
-    "product_id": 1,
-    "quantity": 10
-}
-```
-
-* 修改購物車內商品
-
-[patch] /carts/{cart_id}/items/{item_id}
-```json
-{
-    "quantity": 10
-    "is_checked_out": true
-}
-```
-* 刪除購物車內商品
-
-[delete] /carts/{cart_id}/items/{item_id}
-
-* 查詢購物車內商品
-
-[get] /carts/{cart_id}/items/{item_id}
-
-* 查詢購物車內所有商品
-
-[get] /carts/{cart_id}/items
-
-* 購物車結帳
-
-[post] /carts/{cart_id}/checkout
+![授權API2](.\image\auth2.png)
 
 
-### 訂單
+### 創建新使用者
 
-* 新增訂單
-
-[post] /orders
-```json
-{
-    "user_id": "user id",
-    "product_id": 1,
-    "quantity": 10
-}
-```
-
-* 查詢訂單
-
-[get] /orders/{order_id}
-
-## 記錄想到的問題
-
-* 1/30
-
-1. 購物車結帳前，購物車裡面有選項表示最後是否要結帳(ex. ui checkbox)，有想到兩種方式，需思考哪種方式比較好 (暫時選a)
-
-    a. 每次打勾都修改購物車內商品的is_checked_out，最後結帳時，後端只要查詢is_checked_out為true的商品即可
-
-    b. 每次打勾由前端記錄狀態，最後結帳時送body給後端去最後結帳
+在User類別裡的第一個POST API 為創建新使用者API，可以自行創建新帳號。
