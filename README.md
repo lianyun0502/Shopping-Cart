@@ -46,14 +46,14 @@ python ./app/main.py
 ```
 2. 成功執行後會看到terminal顯示以下訊息
 
-![成功執行](.\image\swagger.png)
+![成功執行](https://github.com/lianyun0502/Shopping-Cart/tree/main/image/swagger.png)
 
 3. 開啟瀏覽器，輸入以下 Uvicorn 網址即可看到網頁介面，在網址後面加上 /docs 即可看到swagger UI 產生的API文件並可以測試API。
 
 
-![website](.\image\website.png)
+![website](https://github.com/lianyun0502/Shopping-Cart/tree/main/image/website.png)
 
-![swagger UI](.\image\swagger2.png)
+![swagger UI](https://github.com/lianyun0502/Shopping-Cart/tree/main/image/swagger2.png)
 
 
 
@@ -126,18 +126,18 @@ python ./app/main.py
 ### 使用者登入
 
 在Auth類別裡的第一個POST API 為登入API，
-![登入](.\image\login.png)
+![登入](https://github.com/lianyun0502/Shopping-Cart/tree/main/image/login.png)
 
 按下Try it out後只需輸入username和password案execute即可登入。
-![登入2](.\image\login2.png)
+![登入2](https://github.com/lianyun0502/Shopping-Cart/tree/main/image/login2.png)
 
 登入成功後會產生一個JWT token，再每次request時都會檢查token是否合法。
-![登入3](.\image\login3.png)
+![登入3](https://github.com/lianyun0502/Shopping-Cart/tree/main/image/login3.png)
 
 ### 授權API
 
 當看到API旁邊有鎖頭的圖示時，就代表每次request時都會檢查token是否合法。
-![授權API](.\image\auth.png)
+![授權API](https://github.com/lianyun0502/Shopping-Cart/tree/main/image/auth.png)
 
 這時只需點開鎖頭圖示，再輸入username和password後案Authorize，如果為已登入帳號，即可使用該API。
 
@@ -145,7 +145,7 @@ Eric的帳號已經建立，可以直接使用
 * username: Eric
 * password: ericpass
 
-![授權API2](.\image\auth2.png)
+![授權API2](https://github.com/lianyun0502/Shopping-Cart/tree/main/image/auth2.png)
 
 
 ### 創建新使用者
