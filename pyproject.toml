@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "shopping-cart"
-version = "0.1.0"
+version = "0.1.1"
 description = "backend shooping cart practice"
 authors = ["eric li"]
 readme = "README.md"
-packages = [{include = "shopping_cart"}]
+packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"

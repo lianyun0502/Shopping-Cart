@@ -1,20 +1,61 @@
 # Shopping Cart
 簡單購物車API與資料庫練習，主要會有:
-* 簡單登入
+* 簡單身分驗證及授權API
 * 新增、修改、刪除、查詢商品
 * 商品加入、修改、取消加入購物車和查詢購物車內容，
 * 並且可以結帳，結帳後會產生訂單，並且可以查詢訂單內容。
 
-
-
 ## 環境建置與需求
 
 * python >= v3.8
-* fastapi
-* uvicorn
-* sqlalchemy
 
 ## 安裝與執行步驟
+
+1. 可以使用docker來執行，或是本地端安裝環境後執行。
+
+### Docker
+
+* 安裝 build docker image
+```bash
+docker build -t shopping-cart . -f .\Dockerfile
+```
+* 執行 docker image
+```bash
+docker run -it --net host shopping-cart
+```
+
+### 本地端安裝
+
+* 安裝 python 3.11
+
+* 安裝相依套件
+- 一般使用 pip install
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+- 或是使用 poetry
+
+    ```bash
+    poetry install
+    ```
+* 執行
+```shell
+python ./app/main.py
+```
+2. 成功執行後會看到terminal顯示以下訊息
+
+![成功執行](.\image\swagger.png)
+
+3. 開啟瀏覽器，輸入以下 Uvicorn 網址即可看到網頁介面，在網址後面加上 /docs 即可看到swagger UI 產生的API文件並可以測試API。
+
+
+![website](.\image\website.png)
+
+![swagger UI](.\image\swagger2.png)
+
+
 
 ## Database 
 
